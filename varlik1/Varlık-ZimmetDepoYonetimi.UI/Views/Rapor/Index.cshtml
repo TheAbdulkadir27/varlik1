@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Raporlar";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Zimmet Raporu</h5>
+                    <p class="card-text">Zimmet durumu, zimmet oranları ve detaylı zimmet istatistikleri.</p>
+                    <a asp-action="ZimmetRaporu" class="btn btn-primary">
+                        <i class="fas fa-chart-pie"></i> Raporu Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Stok Raporu</h5>
+                    <p class="card-text">Stok durumu, düşük stoklu ürünler ve stok hareketleri.</p>
+                    <a asp-action="StokRaporu" class="btn btn-primary">
+                        <i class="fas fa-chart-bar"></i> Raporu Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Satış Siparişi Raporu</h5>
+                    <p class="card-text">Satş Siparişleri, Müşteriler, Toplam ve Vergili Fiyatları</p>
+                    <a asp-action="SalesOrderReport" class="btn btn-primary">
+                        <i class="fas fa-chart-pie"></i> Raporu Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Satın Alma Siparişi Raporu</h5>
+                    <p class="card-text">Satın Alma Siparişleri, Tedarikciler, Toplam ve Vergili Fiyatları</p>
+                    <a asp-action="PurchaseOrderReport" class="btn btn-primary">
+                        <i class="fas fa-chart-pie"></i> Raporu Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

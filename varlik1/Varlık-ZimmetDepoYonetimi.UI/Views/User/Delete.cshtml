@@ -1,0 +1,14 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IdentityUser
+
+<h2>Kullanıcı Sil</h2>
+
+<p><strong>@Model.UserName</strong> adlı kullanıcıyı silmek istediğinize emin misiniz?</p>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>

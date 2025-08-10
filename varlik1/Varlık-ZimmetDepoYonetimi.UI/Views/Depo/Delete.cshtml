@@ -1,0 +1,37 @@
+@model Depo
+@{
+    ViewData["Title"] = "Depo Sil";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Depo Silme Onayı</h3>
+        </div>
+        <div class="card-body">
+            <h4>Bu depoyu silmek istediğinizden emin misiniz?</h4>
+            <dl class="row mt-4">
+                <dt class="col-sm-3">Depo Adı</dt>
+                <dd class="col-sm-9">@Model.DepoAdi</dd>
+
+                <dt class="col-sm-3">Şirket</dt>
+                <dd class="col-sm-9">@(Model.Sirket?.SirketAdi ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Durum</dt>
+                <dd class="col-sm-9">@((Model.AktifMi ?? false) ? "Aktif" : "Pasif")</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="DepoId" />
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-danger" href="/Depo/DeleteConfirmed/@Model.DepoId">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,60 @@
+﻿@model Tax
+@{
+    ViewData["Title"] = "Vergi Düzenle";
+}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Vergi Düzenle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" id="modeledit">
+                <input type="hidden" asp-for="ID" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Vergi Adı</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Percentage" class="form-label">Oranı</label>
+                    <input asp-for="Percentage" class="form-control" type="number" step="0.01" min="0" max="100" placeholder="% giriniz" />
+                    <span asp-validation-for="Percentage" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Vergi Açıklaması</label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Güncelle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("modeledit").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

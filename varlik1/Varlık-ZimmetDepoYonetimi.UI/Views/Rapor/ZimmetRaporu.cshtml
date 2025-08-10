@@ -1,0 +1,193 @@
+@using Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels
+@model ZimmetRaporViewModel
+@{
+    ViewData["Title"] = "Zimmet Raporu";
+}
+<style>
+
+    .no-underline {
+        text-decoration: none; /* Altını çizmesini engeller */
+    }
+
+    .custom-link {
+        color: #ffffff; /* İstediğiniz renk kodunu buraya yazın */
+    }
+
+        .custom-link:hover {
+            color: #34495e; /* Üzerine gelince kırmızı renk */
+            text-decoration: none; /* Altını çizmemek için */
+        }
+</style>
+<div class="container mt-4">
+    <h2>Zimmet Raporu</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Zimmet Sayısı</h5>
+                    <p class="card-text display-4">@Model.ToplamZimmetSayisi</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Zimmetli Ürün Oranı</h5>
+                    <a href="/Zimmet/" class="no-underline custom-link">
+                        <p class="card-text display-4">%@(Model.ZimmetliUrunOrani.ToString("F1"))</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Kayıp/Çalıntı Oranı</h5>
+                    <a href="/KayipCalinti/" class="no-underline custom-link">
+                        <p class="card-text display-4">%@(Model.calintiUrunOrani.ToString("F1"))</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Departman Bazlı Zimmetler</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="departmanChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Aktif Zimmetler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="Datatable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Zimmetlenen</th>
+                                    <th>Departman</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var zimmet in Model.AktifZimmetler)
+                                {
+                                    <tr>
+                                        <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@(zimmet.Urun?.Model?.ModelAdi ?? "Belirtilmemiş")</td>
+                                        <td>@(zimmet.AtananCalisan?.AdSoyad ?? "Belirtilmemiş")</td>
+                                        <td>@(zimmet.AtananCalisan?.Ekip?.EkipAdi)</td>
+                                        <td>@(zimmet.ZimmetBaslangicTarihi?.ToShortDateString() ?? "Belirtilmemiş")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Chart.js Kütüphanesi -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.2.1/chart.umd.min.js"></script>
+
+<style>
+    /* Chart’ın görünmesini garanti etmek için genişlik/yükseklik veriyoruz */
+    #departmanChart {
+        display: block !important;
+        width: 100% !important;
+        max-width: 500px; /* Canvas'ın çok büyük olmaması için */
+        height: auto !important;
+        background-color: white !important; /* Test için arkaplan ekleyebiliriz */
+        margin: auto; /* Ortalıyor */
+    }
+
+    /* Kartların daha düzgün görünmesi için */
+    .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("Sayfa tamamen yüklendi, grafik oluşturuluyor...");
+
+        // Canvas elementini kontrol et
+        var canvas = document.getElementById("departmanChart");
+        if (!canvas) {
+            console.error("HATA: departmanChart elementi bulunamadı!");
+            return;
+        }
+
+        var ctx = canvas.getContext("2d");
+
+        // JSON Verisini Konsola Yazdır (Debug İçin)
+        console.log("Departmanlar:", @Html.Raw(Json.Serialize(Model.DepartmanBazliZimmetler.Keys)));
+        console.log("Değerler:", @Html.Raw(Json.Serialize(Model.DepartmanBazliZimmetler.Values)));
+
+        // Chart.js için veri setini oluştur
+        var departmanChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.DepartmanBazliZimmetler.Keys)), // Departman İsimleri
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.DepartmanBazliZimmetler.Values)), // Değerler
+                        backgroundColor: [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+        '#FFB6C1', '#8A2BE2', '#7FFF00', '#D2691E', '#FF4500', '#DAA520',
+        '#32CD32', '#FFD700', '#ADFF2F', '#FF6347', '#F08080', '#E0FFFF',
+        '#B0E0E6', '#87CEEB', '#708090', '#FF1493', '#C71585', '#D3D3D3',
+        '#90EE90', '#FF00FF', '#800080', '#FF7F50', '#F4A300', '#FFB000',
+        '#C71585', '#98FB98', '#FF6347', '#F5DEB3', '#F0E68C', '#FF98A1',
+        '#7B68EE', '#BC8F8F', '#A52A2A', '#5F9EA0', '#FFE4B5', '#8B0000',
+        '#20B2AA', '#B22222', '#FF6347', '#40E0D0', '#FF8C00', '#FAEBD7',
+        '#B0C4DE', '#D8BFD8', '#F5F5F5', '#F0F8FF', '#FFFFE0'
+    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Grafik oranlarını otomatik ayarlar
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Legend (açıklamalar) aşağıda gözüksün
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        console.log("Grafik başarıyla oluşturuldu!");
+    });
+</script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+<!-- Bootstrap 5 (gerekliyse) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#Datatable').DataTable();
+    });
+</script>
+
+

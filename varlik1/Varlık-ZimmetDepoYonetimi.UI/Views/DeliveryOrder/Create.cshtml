@@ -1,0 +1,182 @@
+﻿@model DeliveryOrderViewModel
+@{
+    ViewData["Title"] = "Teslimat Emri Oluştur";
+    var productsJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ProductsJson);
+    var depolarJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.WareHouses);
+}
+
+<h3>Teslimat Emri Oluştur</h3>
+
+<form method="post">
+    <div class="form-group">
+        <label>Teslimat Tarihi</label>
+        <input asp-for="DeliveryOrderDate" class="form-control" type="date" />
+    </div>
+
+    <div class="form-group">
+        <label>Numara</label>
+        <input asp-for="Number" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>Satış Siparişi</label>
+        <select asp-for="SalesOrderId" asp-items="Model.SalesOrderList" class="form-control" id="salesOrderSelect">
+            <option value="">Seçiniz</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Durum</label>
+        <select asp-for="SalesStateId" asp-items="Model.SalesState" class="form-control"></select>
+    </div>
+
+    <div class="form-group">
+        <label>Açıklama</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <h4>Teslimat Öğeleri</h4>
+
+    <table id="orderItemsTable" class="table">
+        <thead>
+            <tr>
+                <th>Ürün</th>
+                <th>Depo</th>
+                <th>Miktar</th>
+                <th>Stok</th>
+                <th>Birim Fiyat</th>
+                <th>Satır Toplam</th>
+                <th>Sil</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button type="button" class="btn btn-secondary" onclick="addItem()">Ürün Ekle</button>
+
+    <div class="mt-3">
+        <strong>Toplam:</strong> <span id="genelToplam">0.00</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>
+
+@section Scripts {
+    <script>
+        const products = @Html.Raw(Json.Serialize(Model.ProductsJson));
+        const depots = @Html.Raw(Json.Serialize(Model.WareHouses));
+
+        document.getElementById('salesOrderSelect').addEventListener('change', function () {
+            const salesOrderId = this.value;
+            if (!salesOrderId) return;
+
+            fetch('@Url.Action("GetSalesOrderItems", "DeliveryOrder")?salesOrderId=' + salesOrderId)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#orderItemsTable tbody');
+                    tbody.innerHTML = '';
+                    const groupedItems = {};
+
+                    data.forEach(item => {
+                        const key = item.UrunId + '-' + item.DepoId;
+                        if (!groupedItems[key]) {
+                            groupedItems[key] = { ...item };
+                        } else {
+                            groupedItems[key].requestedQuantity += item.requestedQuantity;
+                        }
+                    });
+
+                    Object.values(groupedItems).forEach(item => addRow(item));
+                });
+        });
+
+        function addItem() {
+            addRow({ UrunId: products[0]?.id, DepoId: depots[0]?.value, requestedQuantity: 1, stockQuantity: 0, unitPrice: 0 });
+        }
+
+        function addRow(item) {
+            const tbody = document.querySelector('#orderItemsTable tbody');
+            const row = document.createElement('tr');
+
+            const productCell = document.createElement('td');
+            const productSelect = document.createElement('select');
+            productSelect.name = 'DeliveryOrderItems[0].UrunId';
+            productSelect.classList.add('form-control');
+            products.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.text = p.modelAdi;
+                if (p.id === item.urunId) opt.selected = true;
+                productSelect.appendChild(opt);
+            });
+            productCell.appendChild(productSelect);
+            row.appendChild(productCell);
+
+            const depoCell = document.createElement('td');
+            const depoSelect = document.createElement('select');
+            depoSelect.name = 'DeliveryOrderItems[0].DepoId';
+            depoSelect.classList.add('form-control');
+            depots.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.value;
+                opt.text = d.text;
+                if (d.value == item.depoId) opt.selected = true;
+                depoSelect.appendChild(opt);
+            });
+            depoCell.appendChild(depoSelect);
+            row.appendChild(depoCell);
+
+            const miktarCell = document.createElement('td');
+            const miktarInput = document.createElement('input');
+            miktarInput.type = 'number';
+            miktarInput.name = 'DeliveryOrderItems[0].Quantity';
+            miktarInput.value = item.requestedQuantity;
+            miktarInput.classList.add('form-control');
+            miktarCell.appendChild(miktarInput);
+            row.appendChild(miktarCell);
+
+            const stokCell = document.createElement('td');
+            stokCell.innerText = item.stockQuantity;
+            row.appendChild(stokCell);
+
+            const fiyatCell = document.createElement('td');
+            fiyatCell.innerText = item.unitPrice.toFixed(2);
+            row.appendChild(fiyatCell);
+
+            const toplamCell = document.createElement('td');
+            toplamCell.innerText = (item.unitPrice * item.requestedQuantity).toFixed(2);
+            row.appendChild(toplamCell);
+
+            const silCell = document.createElement('td');
+            const silBtn = document.createElement('button');
+            silBtn.classList.add('btn', 'btn-danger');
+            silBtn.innerHTML = '&times;';
+            silBtn.onclick = () => {
+                row.remove();
+                hesaplaGenelToplam();
+            };
+            silCell.appendChild(silBtn);
+            row.appendChild(silCell);
+
+            miktarInput.addEventListener('input', () => {
+                const miktar = parseFloat(miktarInput.value) || 0;
+                const fiyat = item.unitPrice;
+                toplamCell.innerText = (miktar * fiyat).toFixed(2);
+                hesaplaGenelToplam();
+            });
+
+            tbody.appendChild(row);
+            hesaplaGenelToplam();
+        }
+
+        function hesaplaGenelToplam() {
+            const tbody = document.querySelector('#orderItemsTable tbody');
+            let toplam = 0;
+            tbody.querySelectorAll('tr').forEach(row => {
+                const toplamCell = row.cells[5];
+                toplam += parseFloat(toplamCell.innerText) || 0;
+            });
+            document.getElementById('genelToplam').innerText = toplam.toFixed(2);
+        }
+    </script>
+}

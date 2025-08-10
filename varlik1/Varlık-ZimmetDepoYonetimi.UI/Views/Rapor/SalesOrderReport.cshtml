@@ -1,0 +1,96 @@
+﻿@model IEnumerable<SalesOrderReportViewModel>
+@{
+    ViewData["Title"] = "Satış Siparişi Raporu";
+    var groupOrders = Model.GroupBy(x => x.OrderNumber);
+}
+<style>
+    thead.custom-header {
+        background-color: #f8f9fa;
+        color: #343a40;
+        text-align: center;
+    }
+
+    #searchInput {
+        width: 1270px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Satış Siparişi Raporu</h2>
+
+    <input type="text" id="searchInput" class="form-control" placeholder="Arama yapın (müşteri, ürün, tarih...)">
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle" id="salesOrderTable">
+            <thead class="custom-header">
+                <tr>
+                    <th>Müşteri Adı</th>
+                    <th>Ürün Numarası</th>
+                    <th>Ürün Adı</th>
+                    <th>Birim Fiyatı</th>
+                    <th>Adedi</th>
+                    <th>Toplam</th>
+                    <th>Oluşturulma Tarihi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var orderGroup in groupOrders)
+                {
+                    var totalOrderAmount = orderGroup.Sum(x => x.Total);
+
+                    <tr class="table-primary fw-bold group-header">
+                        <td colspan="7">
+                            Satış Sipariş Numarası : @orderGroup.Key & Ürün Miktarı: @orderGroup.Count()
+                            <span class="float-end">
+                                Vergi : ₺@Convert.ToDecimal(orderGroup.FirstOrDefault()?.TaxAmount).ToString("N2", new System.Globalization.CultureInfo("tr-TR"))
+                                Toplam: ₺@Convert.ToDecimal(totalOrderAmount).ToString("N2", new System.Globalization.CultureInfo("tr-TR"))
+                            </span>
+                        </td>
+                    </tr>
+
+                    foreach (var item in orderGroup)
+                    {
+                        <tr class="searchable-row">
+                            <td class="text-center">@item.CustomerName</td>
+                            <td class="text-center">@item.ProductNumber</td>
+                            <td class="text-center">@item.ProductName</td>
+                            <td class="text-center">@item.UnitPrice.ToString("N2")</td>
+                            <td class="text-center">@item.Quantity.ToString("N0")</td>
+                            <td class="text-center">@item.NotaxTotal.ToString("N2")</td>
+                            <td class="text-center">@item.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            var input = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#salesOrderTable .searchable-row");
+            var groupHeaders = document.querySelectorAll("#salesOrderTable .group-header");
+
+            rows.forEach(row => {
+                var text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            });
+
+            groupHeaders.forEach(header => {
+                // Eğer altındaki tüm satırlar gizlenmişse, header'ı da gizle
+                var nextRows = [];
+                let nextRow = header.nextElementSibling;
+                while (nextRow && !nextRow.classList.contains("group-header")) {
+                    nextRows.push(nextRow);
+                    nextRow = nextRow.nextElementSibling;
+                }
+
+                var visibleRows = nextRows.filter(r => r.style.display !== "none");
+                header.style.display = visibleRows.length > 0 ? "" : "none";
+            });
+        });
+    </script>
+}

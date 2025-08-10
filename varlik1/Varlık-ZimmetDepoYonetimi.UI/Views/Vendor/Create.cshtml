@@ -1,0 +1,137 @@
+﻿@model VendorViewModel
+@{
+    ViewData["Title"] = "Yeni Tedarikci";
+}
+
+<div class="container mt-4">
+    @{
+        var message = TempData["Message"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-danger">
+                @message
+            </div>
+        }
+    }
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Yeni Tedarikci Ekle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="employeeform">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tedarikci Adı</label>
+                    <input asp-for="Name" class="form-control" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tedarikci Sicil Numarası</label>
+                    <input asp-for="Number" class="form-control" value="@Model.Number" readonly />
+                    <span asp-validation-for="Number" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tedarikci Açıklaması</label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Sokak</label>
+                    <input asp-for="Street" class="form-control" type="text" />
+                    <span asp-validation-for="Street" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Şehir</label>
+                    <input asp-for="City" class="form-control" type="text" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Bölge</label>
+                    <input asp-for="State" class="form-control" type="text" />
+                    <span asp-validation-for="State" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Posta Kodu</label>
+                    <input asp-for="ZipCode" class="form-control" type="text" />
+                    <span asp-validation-for="ZipCode" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Ülke</label>
+                    <input asp-for="Country" class="form-control" type="text" required />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Telefon Numarası</label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="(555) 123 45 67" maxlength="14" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">Fax Numarası</label>
+                    <input asp-for="FaxNumber" class="form-control" />
+                    <span asp-validation-for="FaxNumber" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email Adres</label>
+                    <input asp-for="EmailAddress" class="form-control" type="email" placeholder="example@mail.com" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Website</label>
+                    <input asp-for="Website" class="form-control" type="text" placeholder="www.example.com" />
+                    <span asp-validation-for="Website" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tedarikci Grubu</label>
+                    <select asp-for="VendorGroupID" asp-items="@Model.VendorGroup" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                    </select>
+                    <span asp-validation-for="VendorGroupID" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tedarikci Kategori</label>
+                    <select asp-for="VendorCategoryID" asp-items="@Model.VendorCategory" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                    </select>
+                    <span asp-validation-for="VendorCategoryID" class="text-danger"></span>
+                </div>
+
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("employeeform").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

@@ -1,0 +1,50 @@
+﻿@model Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels.KullaniciYetkiViewModel
+<form asp-action="KullaniciYetkileri" method="post" id="userauthority">
+    <input type="hidden" asp-for="UserId" />
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Seç</th>
+                <th>Yetki</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Yetkiler.Count == 0)
+            {
+                <div class="text-danger"> Hiçbir Yetkisi Bulunmamaktadır!</div>
+            }
+            else
+            {
+                @for (int i = 0; i < Model.Yetkiler.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" asp-for="Yetkiler[i].Secili" />
+                            <input type="hidden" asp-for="Yetkiler[i].Value" />
+                            <input type="hidden" asp-for="Yetkiler[i].Aciklama" />
+                        </td>
+                        <td>@Model.Yetkiler[i].Value</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save">Kaydet</i>
+    </button>
+    <a href="/User/Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left">Geri Dön</i>
+    </a>
+</form>
+<script>
+    document.getElementById("userauthority").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>

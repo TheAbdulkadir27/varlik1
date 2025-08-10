@@ -1,0 +1,61 @@
+@model Sirket
+@{
+
+    ViewData["Title"] = "Yeni Şirket";
+
+}
+
+@if (User.IsInRole("Admin") || User.HasClaim("Permission", Permissions.Sirketler.Ekleme))
+{
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Yeni Şirket Ekle</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="companyform">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="SirketAdi" class="form-label">Şirket Adı</label>
+                        <input asp-for="SirketAdi" class="form-control" required />
+                        <span asp-validation-for="SirketAdi" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Durum</label>
+                        <div class="form-check">
+                            <input asp-for="AktifMi" class="form-check-input" type="radio" value="true" checked />
+                            <label class="form-check-label">Aktif</label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="AktifMi" class="form-check-input" type="radio" value="false" />
+                            <label class="form-check-label">Pasif</label>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Geri Dön
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    document.getElementById("companyform").addEventListener("submit", function () {
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

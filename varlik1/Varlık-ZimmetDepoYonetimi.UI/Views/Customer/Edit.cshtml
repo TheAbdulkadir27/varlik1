@@ -1,0 +1,132 @@
+﻿@model CustomerViewModel
+@{
+    ViewData["Title"] = "Müşteri Düzenle";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Müşteri Düzenle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" id="employeedit">
+                <input type="hidden" asp-for="ID" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Müşteri Adı</label>
+                    <input asp-for="Name" class="form-control" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Müşteri Sicil Numarası</label>
+                    <input asp-for="Number" class="form-control" readonly />
+                    <span asp-validation-for="Number" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Müşteri Açıklaması</label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Sokak</label>
+                    <input asp-for="Street" class="form-control" type="text" />
+                    <span asp-validation-for="Street" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Şehir</label>
+                    <input asp-for="City" class="form-control" type="text" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Bölge</label>
+                    <input asp-for="State" class="form-control" type="text" />
+                    <span asp-validation-for="State" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Posta Kodu</label>
+                    <input asp-for="ZipCode" class="form-control" type="text" />
+                    <span asp-validation-for="ZipCode" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Ülke</label>
+                    <input asp-for="Country" class="form-control" type="text" required />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Telefon Numarası</label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="(555) 123 45 67" maxlength="14" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">Fax Numarası</label>
+                    <input asp-for="FaxNumber" class="form-control" />
+                    <span asp-validation-for="FaxNumber" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email Adres</label>
+                    <input asp-for="EmailAddress" class="form-control" type="email" placeholder="example@mail.com" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Website</label>
+                    <input asp-for="Website" class="form-control" type="text" placeholder="www.example.com" />
+                    <span asp-validation-for="Website" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Müşteri Grubu</label>
+                    <select asp-for="CustomerGroupID" asp-items="@Model.CustomerGroup" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                    </select>
+                    <span asp-validation-for="CustomerGroupID" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Müşteri Kategori</label>
+                    <select asp-for="CustomerCategoryID" asp-items="@Model.CustomerCategory" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                    </select>
+                    <span asp-validation-for="CustomerCategoryID" class="text-danger"></span>
+                </div>
+
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Güncelle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("employeedit").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            return;
+        }
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

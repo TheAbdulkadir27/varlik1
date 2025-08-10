@@ -1,0 +1,63 @@
+@model Sirket
+@{
+
+    ViewData["Title"] = "Şirket Düzenle";
+
+}
+@if (User.IsInRole("Admin") || User.HasClaim("Permission", Permissions.Sirketler.Duzenleme))
+{
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Şirket Düzenle</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post" id="companyedit">
+                    <input type="hidden" asp-for="SirketId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="SirketAdi" class="form-label">Şirket Adı</label>
+                                <input asp-for="SirketAdi" class="form-control" />
+                                <span asp-validation-for="SirketAdi" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Durum</label>
+                        <div class="form-check">
+                            <input asp-for="AktifMi" class="form-check-input" type="radio" value="true" />
+                            <label class="form-check-label">Aktif</label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="AktifMi" class="form-check-input" type="radio" value="false" />
+                            <label class="form-check-label">Pasif</label>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Geri Dön
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Güncelle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    document.getElementById("companyedit").addEventListener("submit", function () {
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

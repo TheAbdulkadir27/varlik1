@@ -1,0 +1,66 @@
+@model Ekip
+@{
+    ViewData["Title"] = "Ekip Detayı";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Ekip Detayı</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Ekip Adı</dt>
+                        <dd class="col-sm-8">@Model.EkipAdi</dd>
+
+                        <dt class="col-sm-4">Şirket</dt>
+                        <dd class="col-sm-8">@Model.Sirket?.SirketAdi</dd>
+
+                        <dt class="col-sm-4">Durum</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.AktifMi == true)
+                            {
+                                <span class="badge bg-success">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Pasif</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>Ekip Üyeleri</h5>
+                    @if (Model.Calisans?.Any() == true)
+                    {
+                        <ul class="list-group">
+                            @foreach (var calisan in Model.Calisans)
+                            {
+                                <li class="list-group-item">@calisan.AdSoyad</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Bu ekipte henüz üye bulunmamaktadır.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="text-end mt-3">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Geri Dön
+                </a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.EkipId" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Düzenle
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div> 

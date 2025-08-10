@@ -1,0 +1,34 @@
+@model Model
+@{
+    ViewData["Title"] = "Model Sil";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Model Silme Onayı</h3>
+        </div>
+        <div class="card-body">
+            <h4>Bu modeli silmek istediğinizden emin misiniz?</h4>
+            <dl class="row mt-4">
+                <dt class="col-sm-3">Model Adı</dt>
+                <dd class="col-sm-9">@Model.ModelAdi</dd>
+
+                <dt class="col-sm-3">Üst Model</dt>
+                <dd class="col-sm-9">@Model.UstModel?.ModelAdi</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="ModelId" />
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

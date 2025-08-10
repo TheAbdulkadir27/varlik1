@@ -1,0 +1,147 @@
+@model ZimmetViewModel
+@{
+    ViewData["Title"] = "Yeni Zimmet";
+}
+<style>
+    textarea.form-control {
+        min-height: calc(1.5em + .75rem + 2px);
+        height: 123px;
+    }
+</style>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Yeni Zimmet Oluştur</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="zimmetForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="ModelID" class="form-label">Model</label>
+                            <select asp-for="ModelID" asp-items="Model.Modeller" id="ModelimID" class="form-select" required>
+                                <option value="">Model Seçiniz</option>
+                            </select>
+                            <span asp-validation-for="ModelID" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ürün</label>
+                            <select id="UrunId" asp-items="Model.Urunler" name="UrunId" class="form-select" required>
+                                <option value="">Ürün Seçiniz</option>
+                            </select>
+                            <span asp-validation-for="UrunId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AtananCalisanId" class="form-label">Zimmetlenecek Kişi</label>
+                            <select asp-for="AtananCalisanId" asp-items="Model.Calisanlar" class="form-select" required>
+                                <option value="">Çalışan Seçiniz</option>
+                            </select>
+                            <span asp-validation-for="AtananCalisanId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="ZimmetBaslangicTarihi" class="form-label">Başlangıç Tarihi</label>
+                            <input asp-for="ZimmetBaslangicTarihi" type="date" class="form-control" required />
+                            <span asp-validation-for="ZimmetBaslangicTarihi" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Aciklama" class="form-label">Açıklama</label>
+                            <textarea asp-for="Aciklama" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Aciklama" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="loading" style="display:none;">
+    <img src="loading.gif" alt="Yükleniyor..." />
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+            window.onload = function () {
+            const modelSelect = document.getElementById('ModelimID');
+            const urunSelect = document.getElementById('UrunId');
+            const loading = document.getElementById('loading');
+            let requestCounter = 0;
+
+            if (!urunSelect) {
+                console.error("UrunSelect öğesi bulunamadı!");
+                return;
+            }
+
+            modelSelect.addEventListener('change', async function () {
+                const modelId = this.value;
+                requestCounter++;
+                const currentRequest = requestCounter;
+
+                urunSelect.innerHTML = '<option value="">Ürün Seçiniz</option>';
+
+                if (!modelId) return;
+
+                if (loading) loading.style.display = 'block';
+
+                try {
+                    const response = await fetch(`/Zimmet/GetUrunlerByModelId?modelId=${modelId}`);
+
+                    if (!response.ok) {
+                        console.error('API hatası:', response.statusText);
+                        throw new Error('API hatası');
+                    }
+
+                    const data = await response.json();
+                    
+
+                    if (currentRequest !== requestCounter) return;
+
+                    if (!Array.isArray(data)) {
+                        console.error('Beklenmeyen format:', data);
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.value;
+                        option.textContent = item.text;
+                        urunSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Ürün verisi alınamadı:', error);
+                } finally {
+                    if (loading) loading.style.display = 'none';
+                }
+            });
+        };
+             document.getElementById("zimmetForm").addEventListener("submit", function (e) {
+            if (!this.checkValidity()) {
+                // Form geçerli değilse butonu değiştirme
+                return;
+            }
+
+            const button = this.querySelector("button[type='submit']");
+            button.disabled = true;
+            button.innerText = "Lütfen Bekleyin...";
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+   
+}

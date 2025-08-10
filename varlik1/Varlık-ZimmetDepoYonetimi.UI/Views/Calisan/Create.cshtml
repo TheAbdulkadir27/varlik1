@@ -1,0 +1,98 @@
+@model CalisanViewModel
+@{
+    ViewData["Title"] = "Yeni Çalışan";
+}
+
+<div class="container mt-4">
+    @{
+        var message = TempData["Message"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-danger">
+                @message
+            </div>
+        }
+    }
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Yeni Çalışan</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="employeeform">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="AdSoyad" class="form-label"></label>
+                    <input asp-for="AdSoyad" class="form-control" required/>
+                    <span asp-validation-for="AdSoyad" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="AboneNo" class="form-label"></label>
+                    <input asp-for="AboneNo" class="form-control" />
+                    <span asp-validation-for="AboneNo" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Telefon" class="form-label"></label>
+                    <input asp-for="Telefon" class="form-control" placeholder="(555) 123 45 67" maxlength="14"/>
+                    <span asp-validation-for="Telefon" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Mail" class="form-label"></label>
+                    <input asp-for="Mail" class="form-control" type="email" required />
+                    <span asp-validation-for="Mail" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Şifre" class="form-label"></label>
+                    <input asp-for="Şifre" class="form-control" type="password" required />
+                    <span asp-validation-for="Şifre" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ŞifreTekrar" class="form-label"></label>
+                    <input asp-for="ŞifreTekrar" class="form-control" type="password" required />
+                    <span asp-validation-for="ŞifreTekrar" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SirketId" class="form-label"></label>
+                    <select asp-for="SirketId" asp-items="@Model.Sirketler" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                    </select>
+                    <span asp-validation-for="SirketId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EkipId" class="form-label"></label>
+                    <select asp-for="EkipId" asp-items="@Model.Ekipler" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                    </select>
+                    <span asp-validation-for="EkipId" class="text-danger"></span>
+                </div>
+
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("employeeform").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

@@ -1,0 +1,46 @@
+@model IEnumerable<Zimmet>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ürün</th>
+                <th>Zimmetlenen Kişi</th>
+                <th>Zimmet Tarihi</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var zimmet in Model)
+            {
+                <tr>
+                    <td>@zimmet.Urun?.Model?.ModelAdi</td>
+                    <td>@zimmet.AtananCalisan?.AdSoyad</td>
+                    <td>@zimmet.ZimmetTarihi.ToShortDateString()</td>
+                    <td>
+                        @if (!zimmet.IadeTarihi.HasValue)
+                        {
+                            <span class="badge badge-primary">Aktif</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-secondary">İade Edildi</span>
+                        }
+                    </td>
+                    <td>
+						<a asp-controller="Zimmet" asp-action="Details" asp-route-id="@zimmet.ZimmetId " class="btn btn-sm btn-info">
+                            <td>
+                                <NavLink class="btn btn-sm btn-info" href="zimmet/details/@zimmet.ZimmetId">
+                                    <i class="fas fa-info-circle"></i>
+                                </NavLink>
+                            </td>
+                           class="btn btn-sm btn-info">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div> 

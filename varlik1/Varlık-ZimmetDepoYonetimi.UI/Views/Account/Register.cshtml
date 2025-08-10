@@ -1,0 +1,58 @@
+﻿@model Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels.RegisterViewModel
+@{
+	ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="row justify-content-center mt-5">
+	<div class="col-md-4">
+		<div class="card">
+			<div class="card-body">
+				<h2 class="text-center mb-4">@ViewData["Title"]</h2>
+				<form asp-action="Register" method="post">
+					<div asp-validation-summary="All" class="text-danger"></div>
+					
+					<div class="mb-3">
+						<label asp-for="KullaniciAdi" class="form-label"></label>
+						<input asp-for="KullaniciAdi" class="form-control" />
+						<span asp-validation-for="KullaniciAdi" class="text-danger"></span>
+					</div>
+					
+					<div class="mb-3">
+						<label asp-for="Email" class="form-label"></label>
+						<input asp-for="Email" class="form-control" />
+						<span asp-validation-for="Email" class="text-danger"></span>
+					</div>
+					
+					<div class="mb-3">
+						<label asp-for="Sifre" class="form-label"></label>
+						<input asp-for="Sifre" class="form-control" type="password" />
+						<span asp-validation-for="Sifre" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="SifreTekrar" class="form-label"></label>
+						<input asp-for="SifreTekrar" class="form-control" type="password" />
+						<span asp-validation-for="SifreTekrar" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3 text-center">
+						<small class="text-secondary fst-italic d-block">
+							Lütfen Güçlü Bir Şifre Yapınız.
+						</small>
+						<small class="text-secondary fst-italic d-block">
+							Lütfen geçerli bir e-posta adresi kullanın.
+						</small>
+					</div>
+
+					<div class="d-grid">
+						<button type="submit" class="btn btn-primary">Kayıt Ol</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

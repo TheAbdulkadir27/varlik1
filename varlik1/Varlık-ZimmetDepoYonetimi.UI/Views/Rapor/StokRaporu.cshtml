@@ -1,0 +1,243 @@
+@using Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels
+@model StokRaporViewModel
+@{
+    ViewData["Title"] = "Stok Raporu";
+}
+
+<div class="container mt-4">
+    <h2>Stok Raporu</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Ürün Sayısı</h5>
+                    <p class="card-text display-4">@Model.ToplamUrunSayisi</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Stok Durumu</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="stokChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Düşük Stoklu Ürünler (<10)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="Datatable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Stok</th>
+                                    <th>Depo Adı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var urun in Model.DusukStokluUrunler)
+                                {
+                                    <tr>
+                                        <td>@urun.Model?.ModelAdi</td>
+                                        <td>@urun.StokMiktari</td>
+                                        <td>@(urun.DepoUruns?.FirstOrDefault()?.Depo?.DepoAdi)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Son Stok Hareketleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Ürün</th>
+                                    <th>İşlem</th>
+                                    <th>Miktar</th>
+                                    <th>Kullanıcı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var hareket in Model.SonStokHareketleri)
+                                {
+                                    <tr>
+                                        <td>@hareket.Tarih.ToShortDateString()</td>
+                                        <td>@hareket.Urun?.Model?.ModelAdi</td>
+                                        <td>@hareket.IslemTipi</td>
+                                        <td>@hareket.Miktar</td>
+                                        <td>@hareket.Kullanici</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Stok Grafiği CSS -->
+<style>
+    .chart-container {
+        width: 100%;
+        max-width: 800px; /* Maksimum genişlik */
+        margin: auto; /* Ortalamak için */
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 400px !important; /* Grafik boyutu */
+    }
+</style>
+
+<!-- Stok Grafiği Script -->
+<script>
+    window.onload = function () {
+        // Stok verilerini JSON olarak al ve parse et
+        var stokData = JSON.parse('@Html.Raw(Json.Serialize(Model.StokDurumu))');
+
+        // Canvas elementini seç
+        var ctx = document.getElementById('stokChart').getContext('2d');
+
+        // Eğer stokData boşsa, hata mesajı yazdır
+        if (!stokData || Object.keys(stokData).length === 0) {
+            console.error("Stok verisi bulunamadı! Lütfen Model.StokDurumu'nu kontrol edin.");
+            return;
+        }
+
+        // Grafik oluştur
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(stokData),  // Ürün isimleri
+                datasets: [{
+                    label: 'Stok Miktarı (Zimmetsiz)',
+                    data: Object.values(stokData),  // Stok miktarları
+                   backgroundColor: [
+    'rgba(255, 99, 132, 0.2)',  // Kırmızı
+    'rgba(54, 162, 235, 0.2)',  // Mavi
+    'rgba(255, 159, 64, 0.2)',  // Turuncu
+    'rgba(75, 192, 192, 0.2)',  // Yeşil
+    'rgba(153, 102, 255, 0.2)',  // Mor
+    'rgba(255, 99, 71, 0.2)',   // Kırmızı turuncu
+    'rgba(201, 203, 207, 0.2)', // Gri
+    'rgba(34, 193, 195, 0.2)',  // Yeşil mavi
+    'rgba(255, 20, 147, 0.2)',  // Pembe
+    'rgba(0, 128, 128, 0.2)',   // Deniz mavisi
+    'rgba(255, 206, 86, 0.2)',  // Sarı
+    'rgba(255, 69, 0, 0.2)',    // Kızıl
+    'rgba(0, 255, 0, 0.2)',     // Neon yeşil
+    'rgba(0, 255, 255, 0.2)',   // Cam göbeği
+    'rgba(0, 0, 255, 0.2)',     // Mavi
+    'rgba(255, 255, 0, 0.2)',   // Sarı
+    'rgba(128, 0, 128, 0.2)',   // Mor
+    'rgba(0, 255, 255, 0.2)',   // Turkuaz
+    'rgba(0, 0, 139, 0.2)',     // Koyu mavi
+    'rgba(255, 105, 180, 0.2)', // Pembe
+    'rgba(255, 165, 0, 0.2)',   // Turuncu
+    'rgba(128, 128, 0, 0.2)',   // Zeytin rengi
+    'rgba(255, 20, 147, 0.2)',  // Fuşya
+    'rgba(144, 238, 144, 0.2)', // Açık yeşil
+    'rgba(0, 0, 0, 0.2)',       // Siyah
+    'rgba(255, 255, 255, 0.2)', // Beyaz
+    'rgba(255, 182, 193, 0.2)', // Açık pembe
+    'rgba(0, 100, 0, 0.2)',     // Koyu yeşil
+    'rgba(255, 0, 255, 0.2)'    // Mor-pembe
+],
+borderColor: [
+    'rgba(255, 99, 132, 1)',  // Kırmızı
+    'rgba(54, 162, 235, 1)',  // Mavi
+    'rgba(255, 159, 64, 1)',  // Turuncu
+    'rgba(75, 192, 192, 1)',  // Yeşil
+    'rgba(153, 102, 255, 1)',  // Mor
+    'rgba(255, 99, 71, 1)',   // Kırmızı turuncu
+    'rgba(201, 203, 207, 1)', // Gri
+    'rgba(34, 193, 195, 1)',  // Yeşil mavi
+    'rgba(255, 20, 147, 1)',  // Pembe
+    'rgba(0, 128, 128, 1)',   // Deniz mavisi
+    'rgba(255, 206, 86, 1)',  // Sarı
+    'rgba(255, 69, 0, 1)',    // Kızıl
+    'rgba(0, 255, 0, 1)',     // Neon yeşil
+    'rgba(0, 255, 255, 1)',   // Cam göbeği
+    'rgba(0, 0, 255, 1)',     // Mavi
+    'rgba(255, 255, 0, 1)',   // Sarı
+    'rgba(128, 0, 128, 1)',   // Mor
+    'rgba(0, 255, 255, 1)',   // Turkuaz
+    'rgba(0, 0, 139, 1)',     // Koyu mavi
+    'rgba(255, 105, 180, 1)', // Pembe
+    'rgba(255, 165, 0, 1)',   // Turuncu
+    'rgba(128, 128, 0, 1)',   // Zeytin rengi
+    'rgba(255, 20, 147, 1)',  // Fuşya
+    'rgba(144, 238, 144, 1)', // Açık yeşil
+    'rgba(0, 0, 0, 1)',       // Siyah
+    'rgba(255, 255, 255, 1)', // Beyaz
+    'rgba(255, 182, 193, 1)', // Açık pembe
+    'rgba(0, 100, 0, 1)',     // Koyu yeşil
+    'rgba(255, 0, 255, 1)'    // Mor-pembe
+],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+        console.log("Grafik başarıyla oluşturuldu!");
+    };
+</script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+<!-- Bootstrap 5 (gerekliyse) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#Datatable').DataTable();
+    });
+</script>
+

@@ -1,0 +1,74 @@
+﻿@model IEnumerable<PurchaseOrder>
+@using System;
+@{
+    ViewData["Title"] = "Satın Alma Siparişleri";
+}
+<style>
+    .Asagıyacek {
+        max-height: 620px;
+    }
+
+    .card-body {
+        margin-bottom: 30px;
+    }
+</style>
+<div class="container mt-4">
+    @{
+        var message = TempData["Message"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-danger">
+                @message
+            </div>
+        }
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Satın Alma Siparişleri</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Satın Alma Siparişi
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive Asagıyacek">
+                <table class="table table-striped datatable">
+                    <thead>
+                        <tr>
+                            <th>Number</th>
+                            <th>Sipariş Tarihi</th>
+                            <th>Toplam Tutar</th>
+                            <th>Tedarikci</th>
+                            <th>Vergi Adı</th>
+                            <th>Durumu</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Number</td>
+                                <td>@item.OrderDate!.Value.ToShortDateString()</td>
+                                <td>₺@Convert.ToDecimal(item.AfterTaxAmount / 100).ToString("N0", new System.Globalization.CultureInfo("tr-TR"))</td>
+                                <td>@item.Vendor?.Name</td>
+                                <td>@item.Tax?.Name</td>
+                                <td>@item.PurchaseStatus!.Value</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

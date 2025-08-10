@@ -1,0 +1,55 @@
+@model Zimmet
+@{
+
+    ViewData["Title"] = "Zimmet İade";
+
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Zimmet İade İşlemi</h3>
+        </div>
+
+
+        @if (Model != null && Model.UrunId != null)
+
+        {
+
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Aşağıdaki zimmeti iade almak istediğinizden emin misiniz?
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-3">Ürün</dt>
+                    <dd class="col-sm-9">@Model.Urun?.Model?.ModelAdi</dd>
+
+                    <dt class="col-sm-3">Zimmetlenen Kişi</dt>
+                    <dd class="col-sm-9">@Model.AtananCalisan?.AdSoyad</dd>
+
+                    <dt class="col-sm-3">Zimmet Tarihi</dt>
+                    <dd class="col-sm-9">@Model.ZimmetBaslangicTarihi?.ToString("dd/MM/yyyy")</dd>
+                </dl>
+
+                <form asp-action="IadeAl" asp-route-id="@Model.ZimmetId" method="post">
+                    <input type="hidden" asp-for="ZimmetId" />
+                    <div class="mb-3">
+                        <label for="iadeNotu" class="form-label">İade Notu</label>
+                        <textarea name="iadeNotu" id="iadeNotu" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Vazgeç
+                        </a>
+                        @* @Html.AntiForgeryToken() *@
+                        <button type="submit" onclick="return confirm('İade almak istediğinize emin misiniz?')" class="btn btn-warning">
+                            <i class="fas fa-undo"></i> İade Al
+                        </button>
+                    </div>
+                </form>
+            </div>
+        }
+    </div>
+</div>

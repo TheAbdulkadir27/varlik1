@@ -1,0 +1,66 @@
+@model UrunStatuViewModel
+@{
+    ViewData["Title"] = "Statü Düzenle";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Statü Düzenle</h3>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Edit", "Statu", FormMethod.Post, new { @id = "statuedit" }))
+            {
+                @Html.HiddenFor(x => x.UrunId)
+                @Html.HiddenFor(x => x.StatuId)
+                @Html.ValidationSummary()
+                <div class="mb-3">
+                    <label class="form-label">Ürün</label>
+                    @Html.TextBoxFor(x => x.UrunAdi, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Mevcut Statü</label>
+                    @Html.TextBoxFor(x => x.StatuAdi, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ürün Açıklaması</label>
+                    @Html.TextAreaFor(x => x.Açıklama, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="mb-3">
+                    <label for="YeniStatuId" class="form-label">Yeni Statü</label>
+                    @Html.DropDownListFor(model => model.YeniStatuId, new SelectList(Model.Statuler, "Value", "Text"), "Statü Seçiniz", new { @class = "form-select", @required = "required" })
+                    <span class="text-danger">@Html.ValidationMessageFor(model => model.YeniStatuId)</span>
+                </div>
+
+
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Güncelle
+                    </button>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("statuedit").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

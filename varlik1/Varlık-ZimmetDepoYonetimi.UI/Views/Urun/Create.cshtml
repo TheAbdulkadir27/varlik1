@@ -1,0 +1,155 @@
+@model UrunViewModel
+@{
+    ViewData["Title"] = "Yeni Ürün";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Yeni Ürün Ekle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="productform">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="ModelId" class="form-label">Model</label>
+                            <select asp-for="ModelId" asp-items="Model.Modeller" class="form-select" required>
+                                <option value="">Model Seçiniz</option>
+                            </select>
+                            <span asp-validation-for="ModelId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UrunMaliyeti" class="form-label">Maliyet</label>
+                            <input asp-for="UrunMaliyeti" class="form-control" required />
+                            <span asp-validation-for="UrunMaliyeti" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UrunGuncelFiyat" class="form-label">Güncel Fiyat</label>
+                            <input asp-for="UrunGuncelFiyat" class="form-control" required />
+                            <span asp-validation-for="UrunGuncelFiyat" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="StokMiktari" class="form-label">Stok Miktarı</label>
+                            <input asp-for="StokMiktari" class="form-control" type="number" min="0" required />
+                            <span asp-validation-for="StokMiktari" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DepoId" class="form-label">Depo</label>
+                            <select asp-for="DepoId" asp-items="Model.Depolar" class="form-select" required>
+                                <option value="">-- Depo Seçiniz --</option>
+                            </select>
+                            <span asp-validation-for="DepoId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UnitMeasureId" class="form-label">Birim Ölçüsü</label>
+                            <select asp-for="UnitMeasureId" asp-items="@Model.ÖlçüBirimi" class="form-select" required>
+                                <option value="">-- Ölçü Birimi Seçiniz --</option>
+                            </select>
+                            <span asp-validation-for="UnitMeasureId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProductGroupId" class="form-label">Ürün Grubu</label>
+                            <select asp-for="ProductGroupId" asp-items="@Model.ÜrünGrubu" class="form-select" required>
+                                <option value="">-- Ürün Grubu Seçiniz --</option>
+                            </select>
+                            <span asp-validation-for="ProductGroupId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Number" class="form-label">Numarası</label>
+                            <input type="text" class="form-control" value="@Model.Number" readonly />
+                            <span asp-validation-for="Number" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Garanti Durumu</label>
+                            <div class="form-check">
+                                <input asp-for="GarantiliMi" class="form-check-input" type="radio" value="true" checked />
+                                <label class="form-check-label">Garantili</label>
+                            </div>
+                            <div class="form-check">
+                                <input asp-for="GarantiliMi" class="form-check-input" type="radio" value="false" />
+                                <label class="form-check-label">Garantisiz</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Barkod Durumu</label>
+                            <div class="form-check">
+                                <input asp-for="BarkodluMu" class="form-check-input" type="radio" value="true" checked />
+                                <label class="form-check-label">Barkodlu</label>
+                            </div>
+                            <div class="form-check">
+                                <input asp-for="BarkodluMu" class="form-check-input" type="radio" value="false" />
+                                <label class="form-check-label">Barkodsuz</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Aciklama" class="form-label">Açıklama</label>
+                            <textarea asp-for="Aciklama" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Aciklama" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="StatuId" class="control-label">Ürün Statüsü</label>
+                            <select asp-for="StatuId" asp-items="Model.Statuler" class="form-select" required>
+                                <option value="">-- Statü Seçiniz --</option>
+                            </select>
+                            <span asp-validation-for="StatuId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Durum</label>
+                            <div class="form-check">
+                                <input asp-for="AktifMi" class="form-check-input" type="radio" value="true" checked />
+                                <label class="form-check-label">Aktif</label>
+                            </div>
+                            <div class="form-check">
+                                <input asp-for="AktifMi" class="form-check-input" type="radio" value="false" />
+                                <label class="form-check-label">Pasif</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("productform").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

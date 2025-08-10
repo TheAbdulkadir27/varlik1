@@ -1,0 +1,66 @@
+@model Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels.UserEditViewModel
+
+@{
+    ViewData["Title"] = "Kullanıcı Rolleri Düzenle";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5>Kullanıcı: @Model.UserName</h5>
+                    <p>E-posta: @Model.Email</p>
+                </div>
+            </div>
+
+            <form asp-action="Edit" method="post" id="usereditform">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="UserName" />
+                <input type="hidden" asp-for="Email" />
+
+                <div class="form-group">
+                    <label asp-for="SelectedRoles" class="control-label"></label>
+                    <div class="row">
+                        @foreach (var role in Model.AllRoles)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input type="checkbox" 
+                                           name="SelectedRoles" 
+                                           value="@role" 
+                                           class="form-check-input" 
+                                           @(Model.CurrentRoles.Contains(role) ? "checked" : "") />
+                                    <label class="form-check-label">@role</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Listeye Dön
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("usereditform").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>

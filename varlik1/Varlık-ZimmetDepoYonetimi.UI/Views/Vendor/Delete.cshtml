@@ -1,0 +1,76 @@
+﻿@model Vendor
+@{
+    ViewData["Title"] = "Tedarikci Sil";
+}
+<div class="container mt-4">
+    @{
+        var message = TempData["Message"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-danger">
+                @message
+            </div>
+        }
+    }
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Tedarikci Silme Onayı</h3>
+        </div>
+        <div class="card-body">
+            <h4>Bu Tedarikciyi silmek istediğinizden emin misiniz?</h4>
+            <dl class="row mt-4">
+                <dt class="col-sm-3">Adı</dt>
+                <dd class="col-sm-9">@(Model?.Name ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Ülke</dt>
+                <dd class="col-sm-9">@(Model?.Country ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Posta Kodu</dt>
+                <dd class="col-sm-9">@(Model?.ZipCode ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Şehir</dt>
+                <dd class="col-sm-9">@(Model?.City ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@(Model?.EmailAddress ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Sokak</dt>
+                <dd class="col-sm-9">@(Model?.Street ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Bölge</dt>
+                <dd class="col-sm-9">@(Model?.State ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Website</dt>
+                <dd class="col-sm-9">@(Model?.Website ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Fax Number</dt>
+                <dd class="col-sm-9">@(Model?.FaxNumber ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Müşteri Sicil Numarası</dt>
+                <dd class="col-sm-9">@(Model?.Number ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Telefon Numarası</dt>
+                <dd class="col-sm-9">@(Model?.PhoneNumber ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Grubu</dt>
+                <dd class="col-sm-9">@(Model?.VendorGroup?.Name ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Kategori</dt>
+                <dd class="col-sm-9">@(Model?.VendorCategory?.Name ?? "Belirtilmemiş")</dd>
+
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="ID" />
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

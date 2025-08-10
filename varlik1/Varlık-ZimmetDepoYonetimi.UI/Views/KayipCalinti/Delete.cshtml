@@ -1,0 +1,37 @@
+@model KayipCalinti
+@{
+    ViewData["Title"] = "Kayıp/Çalıntı Kaydı Sil";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Kayıp/Çalıntı Kaydı Silme Onayı</h3>
+        </div>
+        <div class="card-body">
+            <h4>Bu kayıp/çalıntı kaydını silmek istediğinizden emin misiniz?</h4>
+            <dl class="row mt-4">                
+                <dt class="col-sm-3">Tarih</dt>
+                <dd class="col-sm-9">@(Model?.Tarih.ToString("yyyy-MM-dd") ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Durum</dt>
+                <dd class="col-sm-9">@((Model?.KayipMi ?? false) ? "Kayıp" : "Çalıntı")</dd>
+
+                <dt class="col-sm-3">Açıklama</dt>
+                <dd class="col-sm-9">@(Model?.Aciklama ?? "Açıklama yok")</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="KayipCalintiId" />
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

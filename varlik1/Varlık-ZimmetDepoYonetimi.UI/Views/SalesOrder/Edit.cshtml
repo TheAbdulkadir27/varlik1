@@ -1,0 +1,206 @@
+﻿@using Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels;
+@model SalesOrderViewModel
+@{
+    ViewData["Title"] = "Satış Siparişi Düzenle";
+    var taxSelectList = Model.AllTaxes
+        .Select(t => new SelectListItem
+                {
+                    Value = t.ID.ToString(),
+                    Text = $"{t.Name} - {t.Percentage} %"
+                }).ToList();
+
+    var serializedProducts = System.Text.Json.JsonSerializer.Serialize(Model.ProductsJson);
+    var serializedTaxes = System.Text.Json.JsonSerializer.Serialize(Model.AllTaxesJson);
+}
+
+<div class="container mt-4">
+    @if (!string.IsNullOrEmpty(TempData["Message"] as string))
+    {
+        <div class="alert alert-danger">
+            @TempData["Message"]
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Satış Siparişi Düzenle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" id="salesOrderForm">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="OrderDate" class="form-label">Tarih</label>
+                    <input asp-for="OrderDate" type="date" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Number" class="form-label">Numara</label>
+                    <input asp-for="Number" class="form-control" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CustomerId" class="form-label">Müşteri</label>
+                    <select asp-for="CustomerId" asp-items="Model.Customers" class="form-select">
+                        <option value="">Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TaxId" class="form-label">Vergi</label>
+                    <select asp-for="TaxId" asp-items="taxSelectList" class="form-select" id="taxSelect" onchange="calculateTotals()">
+                        <option value="">Vergi Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SalesStateId" class="form-label">Durum</label>
+                    <select asp-for="SalesStateId" asp-items="Model.SalesState" class="form-select">
+                        <option value="">Durum Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Açıklama</label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                </div>
+
+                <hr />
+                <h5>Satış Siparişi Kalemleri</h5>
+                <table class="table table-bordered" id="orderItemsTable">
+                    <thead>
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Birim Fiyat</th>
+                            <th>Miktar</th>
+                            <th>Toplam</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        <!-- JS ile yüklenecek -->
+                    </tbody>
+                </table>
+                <button type="button" onclick="addItem()" class="btn btn-sm btn-success mb-3">+ Kalem Ekle</button>
+
+                <hr />
+                <div class="text-end">
+                    <div><strong>Ara Toplam:</strong> <span id="beforeTaxAmount">0.00</span></div>
+                    <div><strong>Vergi:</strong> <span id="taxAmount">0.00</span></div>
+                    <div><strong>Toplam Tutar:</strong> <span id="afterTaxAmount" class="text-success fw-bold">0.00</span></div>
+
+                    <input type="hidden" asp-for="BeforeTaxAmount" id="BeforeTaxAmount" />
+                    <input type="hidden" asp-for="TaxAmount" id="TaxAmount" />
+                    <input type="hidden" asp-for="AfterTaxAmount" id="AfterTaxAmount" />
+                </div>
+
+                <br />
+                <button type="submit" class="btn btn-primary">Güncelle</button>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        const products = @Html.Raw(serializedProducts);
+        const taxes = @Html.Raw(serializedTaxes);
+        const initialItems = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalesOrderItems));
+
+        let itemIndex = 0;
+
+        function addItem(existingItem = null) {
+            const row = document.createElement('tr');
+            const productOptions = products.map(p => `<option value="${p.Id}" ${existingItem && existingItem.UrunId === p.Id ? 'selected' : ''}>${p.ModelAdi}</option>`).join('');
+            // Burada bölme yok, direkt fiyat alınıyor
+            const unitPriceRaw = existingItem?.UnitPrice ?? (products.find(p => p.Id === (existingItem?.UrunId ?? 0))?.UrunGuncelFiyat ?? 0);
+            const unitPrice = parseFloat(unitPriceRaw); // /100 kaldırıldı
+            const quantity = existingItem?.Quantity ?? 1;
+            const total = unitPrice * quantity;
+
+            row.innerHTML = `
+                <td>
+                    <select name="SalesOrderItems[${itemIndex}].UrunId" class="form-control product-select" onchange="onProductChange(this)">
+                        <option value="">Ürün Seçiniz</option>
+                        ${productOptions}
+                    </select>
+                </td>
+                <td><input name="SalesOrderItems[${itemIndex}].UnitPrice" class="form-control unit-price" readonly value="${unitPrice.toFixed(2)}" /></td>
+                <td><input name="SalesOrderItems[${itemIndex}].Quantity" class="form-control quantity" value="${quantity}" min="1" type="number" oninput="updateRowTotal(this)" /></td>
+                <td><input name="SalesOrderItems[${itemIndex}].Total" class="form-control total" readonly value="${total.toFixed(2)}" /></td>
+                <td><button type="button" onclick="removeItem(this)" class="btn btn-danger btn-sm">X</button></td>
+            `;
+            document.getElementById('itemsBody').appendChild(row);
+            itemIndex++;
+            calculateTotals();
+        }
+
+        function onProductChange(select) {
+            const selectedProductId = parseInt(select.value);
+            const product = products.find(p => p.Id === selectedProductId);
+            const row = select.closest('tr');
+
+            if (product) {
+                row.querySelector('.unit-price').value = product.UrunGuncelFiyat.toFixed(2); // doğrudan fiyat alınıyor
+                row.querySelector('.quantity').value = 1;
+                updateRowTotal(row.querySelector('.quantity'));
+            } else {
+                row.querySelector('.unit-price').value = '';
+                row.querySelector('.total').value = '';
+            }
+            calculateTotals();
+        }
+
+        function updateRowTotal(quantityInput) {
+            const row = quantityInput.closest('tr');
+            const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const total = unitPrice * quantity;
+
+            row.querySelector('.total').value = total.toFixed(2);
+            calculateTotals();
+        }
+
+        function removeItem(button) {
+            button.closest('tr').remove();
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            document.querySelectorAll('#itemsBody tr').forEach(row => {
+                const total = parseFloat(row.querySelector('.total').value.replace(',', '.')) || 0;
+                subtotal += total;
+            });
+
+            const taxSelect = document.getElementById('taxSelect');
+            const selectedTaxId = parseInt(taxSelect.value);
+            const selectedTax = taxes.find(t => t.ID === selectedTaxId);
+            const taxRate = selectedTax ? selectedTax.Percentage : 0;
+
+            const taxAmount = subtotal * taxRate;
+            const afterTaxAmount = subtotal + taxAmount;
+
+            document.getElementById('beforeTaxAmount').innerText = subtotal.toFixed(2);
+            document.getElementById('taxAmount').innerText = taxAmount.toFixed(2);
+            document.getElementById('afterTaxAmount').innerText = afterTaxAmount.toFixed(2);
+
+            document.getElementById('BeforeTaxAmount').value = subtotal.toFixed(2);
+            document.getElementById('TaxAmount').value = taxAmount.toFixed(2);
+            document.getElementById('AfterTaxAmount').value = afterTaxAmount.toFixed(2);
+        }
+
+        document.addEventListener('DOMContentLoaded', () =>
+        {
+            if (initialItems.length > 0)
+            {
+                initialItems.forEach(i => addItem(i));
+            } else
+            {
+                addItem();
+            }
+
+            calculateTotals();
+            document.getElementById('taxSelect').addEventListener('change', calculateTotals);
+        });
+    </script>
+}

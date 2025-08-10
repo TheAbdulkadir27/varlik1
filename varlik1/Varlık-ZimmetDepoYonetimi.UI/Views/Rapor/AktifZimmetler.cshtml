@@ -1,0 +1,45 @@
+@model IEnumerable<Varlık_ZimmetDepoYonetimi.UI.Models.Zimmet>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Aktif Zimmetler Listesi</h3>
+        </div>
+        <div class="card-body">
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Zimmet Ürün</th>
+                        <th>Zimmetlenen</th>
+                        <th>Zimmetleyen</th>
+                        <th>Zimmet Tarihi</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var zimmet in Model)
+                    {
+                        <tr>
+                            <td>@(zimmet.Urun?.Model?.ModelAdi ?? "Belirtilmemiş")</td>
+                            <td>@(zimmet.AtananCalisan?.AdSoyad ?? "Belirtilmemiş")</td>
+                            <td>@(zimmet.AtayanCalisan?.AdSoyad ?? "Belirtilmemiş")</td>
+                            <td>@zimmet.ZimmetTarihi.ToString("dd/MM/yyyy")</td>
+                            <td>@(zimmet.AktifMi.GetValueOrDefault() ? "Aktif" : "Pasif")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#example1").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+        });
+    </script>
+} 

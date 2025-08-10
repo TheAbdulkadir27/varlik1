@@ -1,0 +1,219 @@
+@model Varlık_ZimmetDepoYonetimi.UI.Models.Sirket
+@{
+    ViewData["Title"] = "Şirket Detayları";
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .ekip-item {
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+        .ekip-item:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .ekip-item:active {
+            background-color: #e0e0e0;
+        }
+        #ekipler-list {
+  max-height: 350px;
+  overflow-y: auto;/* Fazla içerik için dikey kaydırma çubuğu ekleyin */
+  width: 550px; 
+}
+</style>
+
+<script>
+    // jQuery'nin yüklendiğini kontrol et
+    if (typeof jQuery === 'undefined') {
+        console.error("jQuery yüklenmedi! Lütfen script etiketini kontrol edin.");
+    } else {
+        console.log("jQuery yüklendi, versiyon: " + jQuery.fn.jquery);
+
+        $(document).ready(function() {
+            console.log("DOM hazır, script çalışıyor.");
+
+            // Çalışanları gizle
+            var calisanlar = $('.calisan-item');
+            console.log("Toplam çalışan sayısı: " + calisanlar.length);
+
+            if (calisanlar.length === 0) {
+                console.warn("Hiçbir .calisan-item bulunamadı! HTML render'ı kontrol edin.");
+            }
+
+            calisanlar.each(function(index) {
+                // Eski .hide() yerine visibility ve opacity ile gizleme
+                $(this).css({
+                    'visibility': 'hidden',
+                    'opacity': '0',
+                    'position': 'absolute',
+                    'top': '-9999px'
+                });
+                var displayValue = $(this).css('display');
+                console.log("Çalışan #" + index + " gizlendi, display: " + displayValue);
+
+                if (displayValue !== 'none') {
+                    console.error("Çalışan #" + index + " gizlenemedi, CSS veya başka bir script engelliyor olabilir!");
+                }
+            });
+
+            // Ekip öğelerine tıklama olayını ekle
+            $('.ekip-item').on('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                var selectedEkipIdRaw = $(this).attr('data-id');
+                console.log("Seçilen Ekip ID (Ham): '" + selectedEkipIdRaw + "'");
+
+                var selectedEkipId = parseInt(selectedEkipIdRaw, 10);
+                if (isNaN(selectedEkipId)) {
+                    console.error("Seçilen Ekip ID geçersiz: '" + selectedEkipIdRaw + "'");
+                    return;
+                }
+                console.log("Seçilen Ekip ID (Dönüştürülen): " + selectedEkipId);
+
+                calisanlar.each(function(index) {
+                    var calisanEkipIdRaw = $(this).attr('data-ekip-id');
+                    console.log("Çalışan #" + index + " Ekip ID (Ham): '" + calisanEkipIdRaw + "'");
+
+                    var calisanEkipId = calisanEkipIdRaw ? parseInt(calisanEkipIdRaw, 10) : 0;
+                    console.log("Çalışan #" + index + " Ekip ID (Dönüştürülen): " + calisanEkipId);
+
+                    if (calisanEkipId === selectedEkipId) {
+                        console.log("Çalışan #" + index + " - Ekip ID'ler eşit (" + selectedEkipId + "), gösteriliyor");
+                        $(this).css({
+                            'visibility': 'visible',
+                            'opacity': '1',
+                            'position': 'static',
+                            'top': 'auto'
+                        });
+                    } else {
+                        console.log("Çalışan #" + index + " - Ekip ID'ler eşit değil (" + calisanEkipId + " != " + selectedEkipId + "), gizleniyor");
+                        $(this).css({
+                            'visibility': 'hidden',
+                            'opacity': '0',
+                            'position': 'absolute',
+                            'top': '-9999px'
+                        });
+                    }
+                });
+            });
+        });
+    }
+</script>
+
+
+
+<div class="container mt-4 mb-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">@Model.SirketAdi - Detaylar</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Genel Bilgiler</h4>
+                    <dl class="row">
+                        <dt class="col-sm-4">Şirket Adı</dt>
+                        <dd class="col-sm-8">@Model.SirketAdi</dd>
+
+                        <dt class="col-sm-4">Durum</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.AktifMi == true)
+                            {
+                                            <span class="badge bg-success">Aktif</span>
+                            }
+                            else
+                            {
+                                            <span class="badge bg-danger">Pasif</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Ekip Sayısı</dt>
+                        <dd class="col-sm-8">@(Model.SirketEkips?.Count ?? 0)</dd>
+
+                        <dt class="col-sm-4">Çalışan Sayısı</dt>
+                        <dd class="col-sm-8">@(Model.Calisans?.Count ?? 0)</dd>
+                    </dl>
+                </div>
+            </div>
+
+
+
+            <div class="container mt-4">
+                <div class="row">
+                    <!-- Ekipler Listesi -->
+                    <div class="col-md-6">
+                        <h4>Ekipler</h4>
+                        @if (Model.SirketEkips?.Any() == true)
+                        {
+                                        <ul class="list-group" id="ekipler-list">
+                                @foreach (var sirketEkip in Model.SirketEkips)
+                                {
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center ekip-item" data-id="@sirketEkip.Ekip?.EkipId">
+                                        @sirketEkip.Ekip?.EkipAdi
+                                        @if (sirketEkip.Ekip?.AktifMi == true)
+                                        {
+                                                                                <span class="badge bg-success">Aktif</span>
+                                        }
+                                        else
+                                        {
+                                                                                <span class="badge bg-danger">Pasif</span>
+                                        }
+                                                            </li>
+                                }
+                                        </ul>
+                        }
+                        else
+                        {
+                                        <p class="text-muted">Bu şirkete ait ekip bulunmamaktadır.</p>
+                        }
+                    </div>
+
+                    <!-- Çalışanlar Listesi -->
+                    <div class="col-md-6">
+                        <h4>Çalışanlar</h4>
+                        <hr />
+                        @if (Model.Calisans?.Any() == true)
+                        {
+                                        <ul class="list-group" id="calisanlar-list">
+                                @foreach (var calisan in Model.Calisans)
+                                {
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center calisan-item" data-ekip-id="@calisan.Ekip?.EkipId">
+                                        @calisan.AdSoyad
+                                                                <div>
+                                                                    <span class="badge bg-info me-2">@(calisan.Ekip?.EkipAdi ?? "Ekip Yok")</span>
+                                            @if (calisan.AktifMi == true)
+                                            {
+                                                                                    <span class="badge bg-success">Aktif</span>
+                                            }
+                                            else
+                                            {
+                                                                                    <span class="badge bg-danger">Pasif</span>
+                                            }
+                                                                </div>
+                                                            </li>
+                                }
+                                        </ul>
+                        }
+                        else
+                        {
+                                        <p class="text-muted">Bu şirkete ait çalışan bulunmamaktadır.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="text-end mt-4">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Geri Dön
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.SirketId" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Düzenle
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+﻿@model YetkiTalepViewModel
+
+<h2>Yetki Talep Et</h2>
+<form asp-action="TalepEt" method="post">
+    <div class="mb-3">
+        @{
+            var message = TempData["Message"] as string;
+            if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-success">
+                    @message
+                </div>
+            }
+        }
+        <label asp-for="SecilenYetkiler" class="form-label">İstediğiniz Yetkiyi Seçerek Admininizden Talep Edin</label>
+        <input type="text" id="yetkiArama" class="form-control mb-3" placeholder="Yetki adı veya Açıklama ara..."/>
+        <table class="table table-bordered table-hover" id="yetkiTablosu">
+            <thead>
+                <tr>
+                    <th>Seç</th>
+                    <th>Yetki Adı</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var yetki in Model.TumYetkiler)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox"
+                                   name="SecilenYetkiler"
+                                   value="@yetki.Id"
+                                   class="form-check-input"
+                            @(Model.SecilenYetkiler.Contains(yetki.Id) ? "checked" : "") />
+                        </td>
+                        <td><strong>@yetki.Ad</strong></td>
+                        <td><small class="text-muted">@yetki.Aciklama</small></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <label>Açıklama:</label>
+        <textarea asp-for="Aciklama" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Talep Et</button>
+</form>
+@section Scripts {
+    <script>
+        document.getElementById('yetkiArama').addEventListener('keyup', function () {
+            var input = this.value.toLowerCase();
+            var rows = document.querySelectorAll('#yetkiTablosu tbody tr');
+
+            rows.forEach(function (row) {
+                var ad = row.cells[1].innerText.toLowerCase();
+                var aciklama = row.cells[2].innerText.toLowerCase();
+
+                if (ad.includes(input) || aciklama.includes(input)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+}

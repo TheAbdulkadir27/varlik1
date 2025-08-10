@@ -1,0 +1,57 @@
+@model DashboardViewModel
+
+<div class="container-fluid">
+    <h2 class="text-primary mb-4">Dashboard</h2>
+    
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Toplam Ürün</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ToplamUrunSayisi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Aktif Zimmetler</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.AktifZimmetSayisi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Düşük Stoklu Ürünler</h6>
+                </div>
+                <div class="card-body">
+                    <partial name="_DusukStokluUrunler" model="Model.DusukStokluUrunSayisi" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Son Zimmet Hareketleri</h6>
+                </div>
+                <div class="card-body">
+                    <partial name="_SonZimmetHareketleri" model="Model.SonZimmetler" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,70 @@
+@model Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels.RolEditViewModel
+@{
+    ViewData["Title"] = "Rol Düzenle";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">@ViewData["Title"]</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" id="roleedit" >
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="RolId" />
+
+                <div class="mb-3">
+                    <label asp-for="RolAdi" class="form-label"></label>
+                    <input asp-for="RolAdi" class="form-control" />
+                    <span asp-validation-for="RolAdi" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SeciliYetkiler" class="form-label">Yetkiler</label>
+                    <div class="row">
+                        @foreach (var yetki in Model.TumYetkiler)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input type="checkbox" 
+                                                   name="SeciliYetkiler" 
+                                                   value="@yetki.Id" 
+                                                   class="form-check-input"
+                                                   @(Model.SeciliYetkiler.Contains(yetki.Id) ? "checked" : "") />
+                                            <label class="form-check-label">
+                                                <strong>@yetki.Ad</strong>
+                                                <br />
+                                                <small class="text-muted">@yetki.Aciklama</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("roleedit").addEventListener("submit", function () {
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

@@ -1,0 +1,57 @@
+﻿@model CustomerContact
+@{
+    ViewData["Title"] = "Müşteri İletişimi Sil";
+}
+<div class="container mt-4">
+    @{
+        var message = TempData["Message"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-danger">
+                @message
+            </div>
+        }
+    }
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Müşteri İletişimi Silme Onayı</h3>
+        </div>
+        <div class="card-body">
+            <h4>Bu Müşteri İletişimini silmek istediğinizden emin misiniz?</h4>
+            <dl class="row mt-4">
+                <dt class="col-sm-3">Adres Adı</dt>
+                <dd class="col-sm-9">@(Model?.Name ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Numara</dt>
+                <dd class="col-sm-9">@(Model?.Number ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">İş Ünvanı</dt>
+                <dd class="col-sm-9">@(Model?.JobTitle ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Telefon Numarası</dt>
+                <dd class="col-sm-9">@(Model?.PhoneNumber ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Email Adresi</dt>
+                <dd class="col-sm-9">@(Model?.EmailAddress ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Acıklaması</dt>
+                <dd class="col-sm-9">@(Model?.Description ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Müşteri Adı</dt>
+                <dd class="col-sm-9">@(Model?.Customer?.Name ?? "Belirtilmemiş")</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="ID" />
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

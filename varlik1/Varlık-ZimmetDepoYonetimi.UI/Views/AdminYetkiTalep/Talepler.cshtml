@@ -1,0 +1,33 @@
+﻿@model List<YetkiTalepAdminViewModel>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Kullanıcı</th>
+            <th>Yetki</th>
+            <th>Açıklama</th>
+            <th>Talep Tarihi</th>
+            <th>Durum</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.KullaniciAdi</td>
+                <td>@item.Yetki</td>
+                <td>@item.Aciklama</td>
+                <td>@item.TalepTarihi.ToString("g")</td>
+                <td>@item.Durum</td>
+                <td>
+                    <form asp-action="TalebiGuncelle" method="post" class="d-inline">
+                        <input type="hidden" name="talepId" value="@item.TalepId" />
+                        <button type="submit" name="islem" value="Onayla" class="btn btn-success btn-sm">Onayla</button>
+                        <button type="submit" name="islem" value="Reddet" class="btn btn-danger btn-sm">Reddet</button>
+                        <button type="submit" name="islem" value="Beklet" class="btn btn-warning btn-sm">Beklet</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

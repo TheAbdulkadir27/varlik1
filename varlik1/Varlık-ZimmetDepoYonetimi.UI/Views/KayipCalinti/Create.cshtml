@@ -1,0 +1,71 @@
+@model KayipCalintiViewModel
+@{
+    ViewData["Title"] = "Yeni Kayıp/Çalıntı Kaydı";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Yeni Kayıp/Çalıntı Kaydı</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="lostform">
+                <div class="mb-3">
+                    <label asp-for="ZimmetId" class="form-label">Zimmet</label>
+                    <select asp-for="ZimmetId" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                        @foreach (var zimmet in Model.AktifZimmetler)
+                        {
+                            <option value="@zimmet.Value">@zimmet.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ZimmetId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="KayipTarihi" class="form-label">Kayıp/Çalıntı Tarihi</label>
+                    <input asp-for="KayipTarihi" type="date" class="form-control"/>
+                    <span asp-validation-for="KayipTarihi" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Aciklama" class="form-label">Açıklama</label>
+                    <textarea asp-for="Aciklama" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Aciklama" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input asp-for="KayipMi" class="form-check-input" type="radio" value="true" checked />
+                        <label class="form-check-label">Kayıp</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="KayipMi" class="form-check-input" type="radio" value="false" />
+                        <label class="form-check-label">Çalıntı</label>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("lostform").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

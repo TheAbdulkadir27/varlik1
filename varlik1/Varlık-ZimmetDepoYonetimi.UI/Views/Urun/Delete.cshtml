@@ -1,0 +1,46 @@
+@model UrunViewModel
+@{
+    ViewData["Title"] = "Ürün Sil";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Ürün Silme Onayı</h3>
+        </div>
+        <div class="card-body">
+            <h4>Bu ürünü silmek istediğinizden emin misiniz?</h4>
+            <dl class="row mt-4">
+                <dt class="col-sm-3">Seri No</dt>
+                <dd class="col-sm-9">@(Model?.SeriNo ?? 0)</dd>
+
+                <dt class="col-sm-3">Model</dt>
+                <dd class="col-sm-9">@(Model?.Model?.ModelAdi ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Garanti Durumu</dt>
+                <dd class="col-sm-9">@((Model?.GarantiliMi ?? false) ? "Garantili" : "Garantisiz")</dd>
+
+                <dt class="col-sm-3">Maliyet</dt>
+                <dd class="col-sm-9">@((Model?.UrunMaliyeti ?? 0).ToString("C"))</dd>
+
+                <dt class="col-sm-3">Güncel Fiyat</dt>
+                <dd class="col-sm-9">@((Model?.UrunGuncelFiyat ?? 0).ToString("C"))</dd>
+
+                <dt class="col-sm-3">Durum</dt>
+                <dd class="col-sm-9">@((Model?.AktifMi ?? false) ? "Aktif" : "Pasif")</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="UrunId" />
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

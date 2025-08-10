@@ -1,0 +1,41 @@
+@model IEnumerable<Urun>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Barkod No</th>
+                <th>Stok</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var urun in Model)
+            {
+                <tr>
+                    <td>@urun.Model?.ModelAdi</td>
+                    <td>@urun.UrunBarkods?.FirstOrDefault()?.BarkodNo?.ToString() ?? "N/A"</td>
+                    <td>@urun.UrunDetays?.FirstOrDefault()?.Miktar</td>
+                    <td>
+                        @if (urun.Zimmets?.Any(z => !z.IadeTarihi.HasValue) == true)
+                        {
+                            <span class="badge badge-warning">Zimmetli</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-success">Müsait</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="Urun" asp-action="Details" asp-route-id="@urun.UrunId" 
+                           class="btn btn-sm btn-info">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

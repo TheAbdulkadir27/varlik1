@@ -1,0 +1,268 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+<style>
+
+    .no-underline {
+        text-decoration: none; /* Altını çizmesini engeller */
+    }
+
+    .custom-link {
+        color: #ffffff; /* İstediğiniz renk kodunu buraya yazın */
+    }
+
+        .custom-link:hover {
+            color: #34495e; /* Üzerine gelince kırmızı renk */
+            text-decoration: none; /* Altını çizmemek için */
+        }
+</style>
+<div class="container mt-4">
+    @{
+        var message = TempData["SuccessMessage"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-success">
+                @message
+            </div>
+        }
+    }
+    <div class="row">
+        <!-- İstatistik Kartları -->
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Toplam Çalışan</h6>
+                            <a href="/Calisan/" class="no-underline custom-link">
+                                <h2 class="mb-0">@Model.ToplamCalisanSayisi</h2>
+                            </a>
+                        </div>
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Toplam Depo</h6>
+                            <a href="/Depo/" class="no-underline custom-link">
+                                <h2 class="mb-0">@Model.ToplamDepoSayisi</h2>
+                            </a>
+                        </div>
+                        <i class="fas fa-warehouse fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Aktif Zimmetler</h6>
+                            <a href="/Zimmet/" class="no-underline custom-link">
+                                <h2 class="mb-0">@Model.AktifZimmetSayisi</h2>
+                            </a>
+                        </div>
+                        <i class="fas fa-clipboard-list fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (User.HasClaim("Permission", Permissions.Raporlar.StokRaporu) || User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.DepoSorumlusu) || User.IsInRole(UserRoles.ZimmetSorumlusu))
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-nowrap">Düşük Stoklu Ürünler (&lt;10)</h6>
+                                <a href="/Rapor/StokRaporu" class="no-underline custom-link">
+                                    <h2 class="mb-0">@Model.DusukStokluUrunSayisi?.Count()</h2>
+                                </a>
+                            </div>
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card bg-danger text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-nowrap">Kayıp/Çalıntı Oranı</h6>
+                                <a href="/KayipCalinti/Index" class="no-underline custom-link">
+                                    <h2 class="mb-0">@Model.calintiUrunOrani.ToString("F1")</h2>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Grafikler ve Tablolar -->
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Zimmet Dağılımı</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="zimmetChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Stok Durumu</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="stokChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Stok Grafiği CSS -->
+<style>
+    .chart-container {
+        width: 100%;
+        max-width: 800px; /* Maksimum genişlik */
+        margin: auto; /* Ortalamak için */
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 400px !important; /* Grafik boyutu */
+    }
+</style>
+
+
+    @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+            // Zimmet Dağılımı Grafiği
+            var zimmetCtx = document.getElementById('zimmetChart').getContext('2d');
+            new Chart(zimmetCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Zimmetli', 'Zimmetsiz'],
+                    datasets: [{
+                        data: [@Model.AktifZimmetSayisi, @(Model.ToplamUrunSayisi - Model.AktifZimmetSayisi)],
+                        backgroundColor: ['#ffc107', '#6c757d']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+
+
+            //Stok Durumu Grafiği
+            var stokCtx = document.getElementById('stokChart').getContext('2d');
+            new Chart(stokCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Json.Serialize(Model.StokDurumu.Keys),
+                    datasets: [{
+                        label: 'Stok Miktarı (Zimmetsiz)',
+                        data: @Json.Serialize(Model.StokDurumu.Values),
+                                backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',  // Kırmızı
+            'rgba(54, 162, 235, 0.2)',  // Mavi
+            'rgba(255, 159, 64, 0.2)',  // Turuncu
+            'rgba(75, 192, 192, 0.2)',  // Yeşil
+            'rgba(153, 102, 255, 0.2)',  // Mor
+            'rgba(255, 99, 71, 0.2)',   // Kırmızı turuncu
+            'rgba(201, 203, 207, 0.2)', // Gri
+            'rgba(34, 193, 195, 0.2)',  // Yeşil mavi
+            'rgba(255, 20, 147, 0.2)',  // Pembe
+            'rgba(0, 128, 128, 0.2)',   // Deniz mavisi
+            'rgba(255, 206, 86, 0.2)',  // Sarı
+            'rgba(255, 69, 0, 0.2)',    // Kızıl
+            'rgba(0, 255, 0, 0.2)',     // Neon yeşil
+            'rgba(0, 255, 255, 0.2)',   // Cam göbeği
+            'rgba(0, 0, 255, 0.2)',     // Mavi
+            'rgba(255, 255, 0, 0.2)',   // Sarı
+            'rgba(128, 0, 128, 0.2)',   // Mor
+            'rgba(0, 255, 255, 0.2)',   // Turkuaz
+            'rgba(0, 0, 139, 0.2)',     // Koyu mavi
+            'rgba(255, 105, 180, 0.2)', // Pembe
+            'rgba(255, 165, 0, 0.2)',   // Turuncu
+            'rgba(128, 128, 0, 0.2)',   // Zeytin rengi
+            'rgba(255, 20, 147, 0.2)',  // Fuşya
+            'rgba(144, 238, 144, 0.2)', // Açık yeşil
+            'rgba(0, 0, 0, 0.2)',       // Siyah
+            'rgba(255, 255, 255, 0.2)', // Beyaz
+            'rgba(255, 182, 193, 0.2)', // Açık pembe
+            'rgba(0, 100, 0, 0.2)',     // Koyu yeşil
+            'rgba(255, 0, 255, 0.2)'    // Mor-pembe
+        ],
+        borderColor: [
+            'rgba(255, 99, 132, 1)',  // Kırmızı
+            'rgba(54, 162, 235, 1)',  // Mavi
+            'rgba(255, 159, 64, 1)',  // Turuncu
+            'rgba(75, 192, 192, 1)',  // Yeşil
+            'rgba(153, 102, 255, 1)',  // Mor
+            'rgba(255, 99, 71, 1)',   // Kırmızı turuncu
+            'rgba(201, 203, 207, 1)', // Gri
+            'rgba(34, 193, 195, 1)',  // Yeşil mavi
+            'rgba(255, 20, 147, 1)',  // Pembe
+            'rgba(0, 128, 128, 1)',   // Deniz mavisi
+            'rgba(255, 206, 86, 1)',  // Sarı
+            'rgba(255, 69, 0, 1)',    // Kızıl
+            'rgba(0, 255, 0, 1)',     // Neon yeşil
+            'rgba(0, 255, 255, 1)',   // Cam göbeği
+            'rgba(0, 0, 255, 1)',     // Mavi
+            'rgba(255, 255, 0, 1)',   // Sarı
+            'rgba(128, 0, 128, 1)',   // Mor
+            'rgba(0, 255, 255, 1)',   // Turkuaz
+            'rgba(0, 0, 139, 1)',     // Koyu mavi
+            'rgba(255, 105, 180, 1)', // Pembe
+            'rgba(255, 165, 0, 1)',   // Turuncu
+            'rgba(128, 128, 0, 1)',   // Zeytin rengi
+            'rgba(255, 20, 147, 1)',  // Fuşya
+            'rgba(144, 238, 144, 1)', // Açık yeşil
+            'rgba(0, 0, 0, 1)',       // Siyah
+            'rgba(255, 255, 255, 1)', // Beyaz
+            'rgba(255, 182, 193, 1)', // Açık pembe
+            'rgba(0, 100, 0, 1)',     // Koyu yeşil
+            'rgba(255, 0, 255, 1)'    // Mor-pembe
+        ],
+                        borderWidth: 1
+
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+    </script>
+    }

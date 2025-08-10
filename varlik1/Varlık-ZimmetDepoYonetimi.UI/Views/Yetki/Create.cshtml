@@ -1,0 +1,40 @@
+@model Yetki
+@{
+    ViewData["Title"] = "Yeni Yetki";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Yeni Yetki Ekle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="mb-3">
+                    <label asp-for="YetkiAdi" class="form-label">Yetki Adı</label>
+                    <input asp-for="YetkiAdi" class="form-control" />
+                    <span asp-validation-for="YetkiAdi" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Durum</label>
+                    <div class="form-check">
+                        <input asp-for="AktifMi" class="form-check-input" type="radio" value="true" checked />
+                        <label class="form-check-label">Aktif</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="AktifMi" class="form-check-input" type="radio" value="false" />
+                        <label class="form-check-label">Pasif</label>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

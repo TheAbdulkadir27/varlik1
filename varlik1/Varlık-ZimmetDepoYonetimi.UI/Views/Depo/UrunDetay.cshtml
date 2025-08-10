@@ -1,0 +1,104 @@
+﻿@model Urun
+@{
+    ViewData["Title"] = "Ürün Detayı";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Ürün Detayı</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Model</dt>
+                        <dd class="col-sm-8">@Model.Model?.ModelAdi</dd>
+
+                        <dt class="col-sm-4">Garanti Durumu</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.GarantiliMi == true)
+                            {
+                                <span class="badge bg-success">Garantili</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Garantisiz</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Stok Miktarı</dt>
+                        <dd class="col-sm-8">@(Model.StokMiktari.ToString())</dd>
+
+                        <dt class="col-sm-4">Depo Adı</dt>
+                        <dd class="col-sm-8">@(Model.DepoUruns?.FirstOrDefault()?.Depo?.DepoAdi)</dd>
+
+
+                        <dt class="col-sm-4">Maliyet</dt>
+                        <dd class="col-sm-8">@Model.UrunMaliyeti?.ToString("C")</dd>
+
+                        <dt class="col-sm-4">Güncel Fiyat</dt>
+                        <dd class="col-sm-8">@Model.UrunGuncelFiyat?.ToString("C")</dd>
+
+                        <dt class="col-sm-4">Statü</dt>
+                        <dd class="col-sm-8">
+                            @{
+                                var sonStatu = Model.UrunStatus.OrderByDescending(us => us.Tarih).FirstOrDefault();
+                                if (sonStatu != null)
+                                {
+                                    <span class="badge bg-info">@sonStatu.Statu?.StatuAdi</span>
+                                    <small class="text-muted d-block">(@string.Format("{0:dd.MM.yyyy HH:mm}", sonStatu.Tarih))</small>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Statü Yok</span>
+                                }
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Barkod Durumu</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.BarkodluMu == true)
+                            {
+                                <span class="badge bg-info">Barkodlu</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Barkodsuz</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Durum</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.AktifMi == true)
+                            {
+                                <span class="badge bg-success">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Pasif</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>Açıklama</h5>
+                    <p>@Model.Aciklama</p>
+                </div>
+            </div>
+
+            <div class="text-end mt-3">
+                <a href="/Depo/Details/@Model.DepoUruns?.FirstOrDefault()?.DepoId" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Geri Dön
+                </a>
+               @*  @if (User.IsInRole("Admin") || User.IsInRole("DepoSorumlusu"))
+                {
+                    <a href="/Urun/Edit/@Model.UrunId" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Düzenle
+                    </a>
+                } *@
+            </div>
+        </div>
+    </div>
+</div> 

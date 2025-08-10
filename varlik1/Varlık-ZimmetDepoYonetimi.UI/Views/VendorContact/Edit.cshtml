@@ -1,0 +1,87 @@
+﻿@model VendorContactViewModel
+@{
+    ViewData["Title"] = "Tedarikci İletişimi Düzenle";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Tedarikci İletişimi Düzenle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" id="employeedit">
+                <input type="hidden" asp-for="ID" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Adres Adı</label>
+                    <input asp-for="Name" class="form-control" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Numara</label>
+                    <input asp-for="Number" class="form-control" />
+                    <span asp-validation-for="Number" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">İş Unvanı</label>
+                    <textarea asp-for="JobTitle" class="form-control"></textarea>
+                    <span asp-validation-for="JobTitle" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Telefon Numarası</label>
+                    <input asp-for="PhoneNumber" class="form-control" type="text" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email Adres</label>
+                    <input asp-for="EmailAddress" class="form-control" type="text" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Acıklama</label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tedarikciler</label>
+                    <select asp-for="VendorId" asp-items="@Model.Vendors" class="form-select" required>
+                        <option value="">Tedarikci Seçiniz...</option>
+                    </select>
+                    <span asp-validation-for="VendorId" class="text-danger"></span>
+                </div>
+
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Güncelle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("employeedit").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            return;
+        }
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

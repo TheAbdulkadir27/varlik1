@@ -1,0 +1,82 @@
+﻿@model Varlık_ZimmetDepoYonetimi.UI.Models.ViewModels.ZimmetAtaViewModel
+@{
+    ViewData["Title"] = "Zimmet Ata";
+}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Zimmet Atama Formu</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="ZimmetAta" method="post" id="assetedit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (Model != null && Model.Zimmet.UrunId != null)
+                {
+                    <div class="row">
+                        @Html.HiddenFor(x => x.Zimmet.ZimmetId)
+                        @Html.HiddenFor(x => x.Zimmet.UrunId)
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="@Model.Zimmet.UrunId" class="form-label">Ürün</label>
+                                <select asp-for="@Model.Zimmet.UrunId" class="form-select" disabled>
+                                    <option value="@Model.Zimmet.UrunId" selected>@Model.Zimmet.Urun.Model.ModelAdi</option>  <!-- Seçilen ürünün adı -->
+                                </select>
+                                <span asp-validation-for="@Model.Zimmet.UrunId" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="@Model.Zimmet.AtananCalisanId" class="form-label">Zimmet Atanacak Kişi</label>
+                                <select asp-for="@Model.Zimmet.AtananCalisanId" class="form-select" required>
+                                    <option value="">Çalışan Seçiniz</option>
+                                    @foreach (var calisan in Model.Calisanlar)
+                                    {
+                                        <option value="@calisan.CalisanId">@calisan.AdSoyad</option> <!-- Çalışan adı ve soyadı -->
+                                    }
+                                </select>
+                                <span asp-validation-for="@Model.Zimmet.AtananCalisanId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="@Model.Zimmet.ZimmetBaslangicTarihi" class="form-label">Başlangıç Tarihi</label>
+                                <input asp-for="@Model.Zimmet.ZimmetBaslangicTarihi" type="date" class="form-control" required />
+                                <span asp-validation-for="@Model.Zimmet.ZimmetBaslangicTarihi" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="@Model.Aciklama" class="form-label">Açıklama</label>
+                                <textarea asp-for="@Model.Aciklama" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="@Model.Aciklama" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("assetedit").addEventListener("submit", function (e) {
+        if (!this.checkValidity()) {
+            // Form geçerli değilse butonu değiştirme
+            return;
+        }
+
+        const button = this.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.innerText = "Lütfen Bekleyin...";
+    });
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

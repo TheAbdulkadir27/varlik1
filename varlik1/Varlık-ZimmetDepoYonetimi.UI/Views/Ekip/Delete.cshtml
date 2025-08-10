@@ -1,0 +1,58 @@
+﻿@model Varlık_ZimmetDepoYonetimi.UI.Models.Ekip
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container mt-4">
+    @{
+        var message = TempData["Message"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-danger">
+                @message
+            </div>
+        }
+    }
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Ekip Silme</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Aşağıdaki Ekibi Silmek istediğinizden emin misiniz?
+            </div>
+            @using (Html.BeginForm("Delete", "Ekip", FormMethod.Post))
+            {
+                <dl class="row">
+                    <dt class="col-sm-3"> Ekip Adı</dt>
+                    <dd class="col-sm-9">@Model.EkipAdi</dd>
+                </dl>
+                @Html.HiddenFor(x => x.EkipId)
+                <div class="text-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Vazgeç
+                    </a>
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning" onclick=" return confirmDelete(@Model.EkipId)">
+                        <i class="fas fa-undo"></i> Ekibi Sil
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    function confirmDelete(itemid)
+    {
+        if (confirm("Silmek istediğinize emin misiniz?"))
+        {
+            window.location.href = "/Ekip/Delete/" + itemid
+        } else
+        {
+            return false;
+        }
+    }
+</script>
+
+

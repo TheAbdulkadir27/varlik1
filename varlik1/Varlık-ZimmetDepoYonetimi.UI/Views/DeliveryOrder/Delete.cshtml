@@ -1,0 +1,62 @@
+﻿@model DeliveryOrder
+@{
+    ViewData["Title"] = "Teslimat Siparişi Sil";
+}
+<div class="container mt-4">
+    @{
+        var message = TempData["Message"] as string;
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-danger">
+                @message
+            </div>
+        }
+    }
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Teslimat Siparişi Silme Onayı</h3>
+        </div>
+        <div class="card-body">
+            <h4>Bu Teslimat Siparişini silmek istediğinizden emin misiniz?</h4>
+            <dl class="row mt-4">
+                <dt class="col-sm-3">Numara</dt>
+                <dd class="col-sm-9">@(Model?.Number ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Teslimat Tarihi</dt>
+                <dd class="col-sm-9">@(Model?.DeliveryDate.Value.ToShortDateString() ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Acıklama</dt>
+                <dd class="col-sm-9">@(Model?.Description ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Müşteri</dt>
+                <dd class="col-sm-9">@(Model?.SalesOrder?.Customer?.Name ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Mevcut Olan Ürünler</dt>
+                <dd class="col-sm-9">Ürün Adedi @(Model?.DeliveryOrderItemList.Count().ToString() ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Ürünler:</dt>
+                <dd class="col-sm-9">
+                    @string.Join(", ", Model?.DeliveryOrderItemList
+                             .Where(x => x.Urun?.Model?.ModelAdi != null)
+                             .Select(x => x.Urun.Model.ModelAdi))
+                </dd>
+
+                <dt class="col-sm-3">Ürünlerin Toplam Adedi</dt>
+                <dd class="col-sm-9">@(Model?.DeliveryOrderItemList?.Sum(x => x.Quantity).Value.ToString() ?? "Belirtilmemiş")</dd>
+
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="ID" />
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

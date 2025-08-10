@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Zimmet Yönetimi</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="shortcut icon" href="~/images/LogoErkiz1.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
+    <style>
+
+        footer {
+            margin-top: 35px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/erkiz_logowithtext.png" alt="Erkiz Varlık" style="max-height: 50px;">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 d-flex">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">AnaSayfa</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Kullanıcı Yönetimi</a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    Organizasyon
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Sirket" asp-action="Index">Şirketler</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Ekip" asp-action="Index">Ekipler</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Calisan" asp-action="Index">Çalışanlar</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    Sistem
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Yetki" asp-action="Index">Yetkiler</a></li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="AdminYetkiTalep" asp-action="Talepler">Yetki Talepleri ⭐</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="YetkiTalep" asp-action="Index">Yetki Talep Et ⭐</a></li>
+                                    }
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">Şifre Değişikliği</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Rol" asp-action="Index">Roller</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Döviz" asp-action="Index">Döviz Kurları</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Backup" asp-action="Index">Backup/Restore</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    Varlık Yönetimi
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Urun" asp-action="Index">Ürünler</a></li>
+                                    <li><a class="dropdown-item" asp-controller="ProductGroup" asp-action="Index">Ürün Grupları</a></li>
+                                    <li><a class="dropdown-item" asp-controller="UnitMeasure" asp-action="Index">Birim ölçüsü</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Model" asp-action="Index">Modeller</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Depo" asp-action="Index">Depolar</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Statu" asp-action="Index">Statüler</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    Zimmet İşlemleri
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Zimmet" asp-action="Index">Zimmetler</a></li>
+                                    <li><a class="dropdown-item" asp-controller="KayipCalinti" asp-action="Index">Kayıp/Çalıntı</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    Satış İşlemleri
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="CustomerGroup" asp-action="Index">Müşteri Grubu</a></li>
+                                    <li><a class="dropdown-item" asp-controller="CustomerCategory" asp-action="Index">Müşteri Kategori</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="Index">Müşteri</a></li>
+                                    <li><a class="dropdown-item" asp-controller="CustomerContact" asp-action="Index">Müşteri İletişim</a></li>
+                                    <li><a class="dropdown-item" asp-controller="SalesOrder" asp-action="Index">Satış Siparişi Formu</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    Satın Alma İşlemleri
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="VendorGroup" asp-action="Index">Tedarikci Grubu</a></li>
+                                    <li><a class="dropdown-item" asp-controller="VendorCategory" asp-action="Index">Tedarikci Kategori</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Vendor" asp-action="Index">Tedarikci</a></li>
+                                    <li><a class="dropdown-item" asp-controller="VendorContact" asp-action="Index">Tedarikci İletişim</a></li>
+                                    <li><a class="dropdown-item" asp-controller="PurchaseOrder" asp-action="Index">Satın Alma Siparişi Formu</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Rapor" asp-action="Index">Raporlar</a>
+                            </li>
+                        }
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            <img src="~/images/erkiz_logowithtext.png" alt="Erkiz Varlık" style="max-height: 50px;">   &copy; @DateTime.Now.Year - Erkiz Mühendislik Varlık Zimmet Yönetimi
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
